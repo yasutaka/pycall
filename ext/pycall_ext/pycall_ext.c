@@ -155,6 +155,14 @@ pyptr_get_address(VALUE self)
   return rb_uint_new((VALUE)PYPTR_PYOBJ(pyptr));
 }
 
+static VALUE
+pyptr_is_none(VALUE self)
+{
+  pyptr_t *pyptr;
+  TypedData_Get_Struct(self, pyptr_t, &pyptr_data_type, pyptr);
+  return PYPTR_PYOBJ(pyptr) == Py_None ? Qtrue : Qfalse;
+}
+
 static void *
 find_symbol(VALUE libpython, char const *name)
 {
@@ -203,6 +211,7 @@ Init_pycall_ext(void)
   rb_define_method(cPyPtr, "initialize", pyptr_initialize, -1);
   rb_define_method(cPyPtr, "__refcnt__", pyptr_get_refcnt, 0);
   rb_define_method(cPyPtr, "__address__", pyptr_get_address, 0);
+  rb_define_method(cPyPtr, "none?", pyptr_is_none, 0);
 
   rb_define_singleton_method(cPyPtr, "__init__", pyptr_s_init, 1);
   rb_define_singleton_method(cPyPtr, "none", pyptr_s_none, 0);
