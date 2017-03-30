@@ -16,19 +16,15 @@ RSpec.describe PyCall do
     subject(:main_dict) { PyCall::Eval.send :main_dict }
 
     specify 'ob_refcnt >= 2' do
-      expect(main_dict.__pyobj__[:ob_refcnt]).to be >= 2
+      expect(main_dict.__pyobj__.__refcnt__).to be >= 2
     end
   end
 
   describe '.import_module' do
     context 'without block' do
       it 'returns an imported module' do
-        begin
-          mod = PyCall.import_module('__main__')
-          expect(mod.type.inspect).to match(/module/)
-        ensure
-          PyCall.decref(mod.__pyobj__)
-        end
+        mod = PyCall.import_module('__main__')
+        expect(mod.type.inspect).to match(/module/)
       end
     end
 
@@ -36,11 +32,13 @@ RSpec.describe PyCall do
       it 'ensures to release python module object' do
         cnt = {}
         PyCall.import_module('__main__') { |outer_m|
-          cnt[:before] = outer_m.__pyobj__[:ob_refcnt]
+          cnt[:before] = outer_m.__pyobj__.__refcnt__
           PyCall.import_module('__main__') { |inner_m|
-            cnt[:inner] = inner_m.__pyobj__[:ob_refcnt]
+            cnt[:inner] = inner_m.__pyobj__.__refcnt__
+            inner_m = nil
           }
-          cnt[:after] = outer_m.__pyobj__[:ob_refcnt]
+          GC.start
+          cnt[:after] = outer_m.__pyobj__.__refcnt__
         }
         expect(cnt[:inner]).to eq(cnt[:before] + 1)
         expect(cnt[:after]).to eq(cnt[:before])

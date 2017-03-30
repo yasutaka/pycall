@@ -49,8 +49,8 @@ module PyCall
     end
 
     def initialize(pyobj)
-      pyobj = LibPython::PyObjectStruct.new(pyobj) if pyobj.kind_of? FFI::Pointer
-      pyobj = pyobj.__pyobj__ unless pyobj.kind_of? LibPython::PyObjectStruct
+      pyobj = PyPtr.new(pyobj) if pyobj.kind_of? FFI::Pointer
+      pyobj = pyobj.__pyobj__ unless pyobj.kind_of? PyPtr
       @__pyobj__ = pyobj
     end
 
@@ -76,7 +76,7 @@ module PyCall
       case klass
       when PyObjectWrapper
         __pyobj__.kind_of? klass.__pyobj__
-      when LibPython::PyObjectStruct
+      when PyPtr
         __pyobj__.kind_of? klass
       else
         super

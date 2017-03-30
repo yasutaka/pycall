@@ -63,7 +63,7 @@ module PyCall
         Conversions.from_ruby(obj)
       end
 
-      context 'for a PyObjectStruct' do
+      context 'for a PyPtr' do
         let(:pyobj) { PyCall.eval('object()') }
         subject { from_ruby(pyobj.__pyobj__) }
         it { is_expected.to equal(pyobj.__pyobj__) }
@@ -71,20 +71,20 @@ module PyCall
 
       context 'for true' do
         subject { from_ruby(true) }
-        it { is_expected.to be_kind_of(LibPython.PyBool_Type) }
+        it { is_expected.to be_kind_of(LibPython::PyBool_Type) }
         specify { expect(subject.to_ruby).to equal(true) }
       end
 
       context 'for false' do
         subject { from_ruby(false) }
-        it { is_expected.to be_kind_of(LibPython.PyBool_Type) }
+        it { is_expected.to be_kind_of(LibPython::PyBool_Type) }
         specify { expect(subject.to_ruby).to equal(false) }
       end
 
       [-1, 0, 1].each do |int_value|
         context "for #{int_value}" do
           subject { from_ruby(int_value) }
-          it { is_expected.to be_kind_of(LibPython.PyInt_Type) }
+          it { is_expected.to be_kind_of(LibPython::PyInt_Type) }
           specify { expect(subject.to_ruby).to eq(int_value) }
         end
       end
@@ -92,7 +92,7 @@ module PyCall
       [-Float::INFINITY, -1.0, 0.0, 1.0, Float::INFINITY, Float::NAN].each do |float_value|
         context "for #{float_value}" do
           subject { from_ruby(float_value) }
-          it { is_expected.to be_kind_of(LibPython.PyFloat_Type) }
+          it { is_expected.to be_kind_of(LibPython::PyFloat_Type) }
           if float_value.nan?
             specify { expect(subject.to_ruby).to be_nan }
           else
@@ -104,7 +104,7 @@ module PyCall
       context 'for a Hash' do
         let(:hash) { { a: 1, b: 2, c: 3 } }
         subject { from_ruby(hash) }
-        it { is_expected.to be_kind_of(LibPython.PyDict_Type) }
+        it { is_expected.to be_kind_of(LibPython::PyDict_Type) }
         specify { expect(Conversions.to_ruby(subject)).to eq(hash) }
       end
     end

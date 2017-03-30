@@ -26,50 +26,50 @@ module PyCall
       @python_type_map << TypePair.new(pytype, rbtype)
     end
 
-    # Convert a PyCall::PyObjectStruct object to a Ruby object
+    # Convert a PyCall::PyPtr object to a Ruby object
     #
-    # @param [PyCall::PyObjectStruct] pyptr  a PyObjectStruct object.
+    # @param [PyCall::PyPtr] pyptr  a PyPtr object.
     #
     # @return a Ruby object converted from `pyptr`.
     def self.to_ruby(pyptr)
       return nil if pyptr.null? || PyCall.none?(pyptr)
 
       case
-      when PyCall::Types.pyisinstance(pyptr, LibPython.PyType_Type)
+      when PyCall::Types.pyisinstance(pyptr, LibPython::PyType_Type)
         return TypeObject.new(pyptr)
 
-      when PyCall::Types.pyisinstance(pyptr, LibPython.PyBool_Type)
+      when PyCall::Types.pyisinstance(pyptr, LibPython::PyBool_Type)
         return Conversions.convert_to_boolean(pyptr)
 
-      when PyCall::Types.pyisinstance(pyptr, LibPython.PyInt_Type)
+      when PyCall::Types.pyisinstance(pyptr, LibPython::PyInt_Type)
         return Conversions.convert_to_integer(pyptr)
 
-      when PyCall::Types.pyisinstance(pyptr, LibPython.PyLong_Type)
+      when PyCall::Types.pyisinstance(pyptr, LibPython::PyLong_Type)
         # TODO: should make Bignum
 
-      when PyCall::Types.pyisinstance(pyptr, LibPython.PyFloat_Type)
+      when PyCall::Types.pyisinstance(pyptr, LibPython::PyFloat_Type)
         return Conversions.convert_to_float(pyptr)
 
-      when PyCall::Types.pyisinstance(pyptr, LibPython.PyComplex_Type)
+      when PyCall::Types.pyisinstance(pyptr, LibPython::PyComplex_Type)
         return Conversions.convert_to_complex(pyptr)
 
-      when PyCall::Types.pyisinstance(pyptr, LibPython.PyString_Type)
+      when PyCall::Types.pyisinstance(pyptr, LibPython::PyString_Type)
         return Conversions.convert_to_string(pyptr)
 
-      when PyCall::Types.pyisinstance(pyptr, LibPython.PyUnicode_Type)
+      when PyCall::Types.pyisinstance(pyptr, LibPython::PyUnicode_Type)
         py_str_ptr = LibPython.PyUnicode_AsUTF8String(pyptr)
         return Conversions.convert_to_string(py_str_ptr).force_encoding(Encoding::UTF_8)
 
-      when PyCall::Types.pyisinstance(pyptr, LibPython.PyList_Type)
+      when PyCall::Types.pyisinstance(pyptr, LibPython::PyList_Type)
         return PyCall::List.new(pyptr)
 
-      when PyCall::Types.pyisinstance(pyptr, LibPython.PyTuple_Type)
+      when PyCall::Types.pyisinstance(pyptr, LibPython::PyTuple_Type)
         return Conversions.convert_to_tuple(pyptr)
 
-      when PyCall::Types.pyisinstance(pyptr, LibPython.PyDict_Type)
+      when PyCall::Types.pyisinstance(pyptr, LibPython::PyDict_Type)
         return PyCall::Dict.new(pyptr)
 
-      when PyCall::Types.pyisinstance(pyptr, LibPython.PySet_Type)
+      when PyCall::Types.pyisinstance(pyptr, LibPython::PySet_Type)
         return PyCall::Set.new(pyptr)
       end
 
@@ -91,7 +91,7 @@ module PyCall
 
     def self.from_ruby(obj)
       case obj
-      when LibPython::PyObjectStruct
+      when PyPtr
         obj
       when PyObject, PyObjectWrapper
         obj.__pyobj__
@@ -152,7 +152,7 @@ module PyCall
 
     def self.convert_to_array(py_obj, force_list: true, array_class: Array)
       case
-      when force_list || py_obj.kind_of?(LibPython.PyList_Type)
+      when force_list || py_obj.kind_of?(LibPython::PyList_Type)
         len = LibPython.PySequence_Size(py_obj)
         array_class.new(len) do |i|
           LibPython.PySequence_GetItem(py_obj, i).to_ruby
@@ -165,7 +165,7 @@ module PyCall
     end
   end
 
-  class LibPython::PyObjectStruct
+  class PyPtr
     def to_ruby
       Conversions.to_ruby(self)
     end

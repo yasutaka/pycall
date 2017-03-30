@@ -6,7 +6,7 @@ module PyCall
     end
 
     def callable?(pyobj)
-      unless pyobj.kind_of? LibPython::PyObjectStruct
+      unless pyobj.kind_of? PyPtr
         raise TypeError, "the argument must be a Python object" unless pyobj.respond_to? :__pyobj__
         pyobj = pyobj.__pyobj__
       end
@@ -14,21 +14,10 @@ module PyCall
     end
 
     def dir(pyobj)
-      pyobj = pyobj.__pyobj__ unless pyobj.kind_of? LibPython::PyObjectStruct
+      pyobj = pyobj.__pyobj__ unless pyobj.kind_of? PyPtr
       value = LibPython.PyObject_Dir(pyobj)
       return value.to_ruby unless value.null?
       raise PyError.fetch
-    end
-
-    def incref(pyobj)
-      LibPython.Py_IncRef(pyobj)
-      pyobj
-    end
-
-    def decref(pyobj)
-      LibPython.Py_DecRef(pyobj)
-      pyobj.send :pointer=, FFI::Pointer::NULL
-      pyobj
     end
 
     def int(pyobj)
@@ -42,20 +31,19 @@ module PyCall
     end
 
     def None
-      LibPython.Py_None
+      @None ||= PyPtr.none
     end
 
     def none?(pyobj)
       case pyobj
       when FFI::Pointer
         address = pyobj.address
-      when LibPython::PyPtr
+      when PyPtr
         address = pyobj.__address__
       else
         address = pyobj.__pyobj__.__address__
       end
-      # FIXME: Do not use PyPtr.none to avoid extra object allocation
-      LibPython::PyPtr.none.__address__ == address
+      self.None.__address__ == address
     end
 
     def slice(*args)

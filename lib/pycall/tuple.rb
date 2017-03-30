@@ -12,7 +12,7 @@ module PyCall
           tuple[index] = obj
         end
         tuple
-      when LibPython::PyObjectStruct
+      when PyPtr
         super(init)
       end
     end

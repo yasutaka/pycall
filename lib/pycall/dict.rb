@@ -4,7 +4,7 @@ module PyCall
 
     def self.new(init=nil)
       case init
-      when LibPython::PyObjectStruct
+      when PyPtr
         super
       when nil
         new(LibPython.PyDict_New())
@@ -28,17 +28,17 @@ module PyCall
               end
     ensure
       case value
-      when LibPython::PyObjectStruct
-        PyCall.incref(value)
+      when PyPtr
+        PyCall::LibPython.Py_IncRef(value)
       when PyObjectWrapper
-        PyCall.incref(value.__pyobj__)
+        PyCall::LibPython.Py_IncRef(value.__pyobj__)
       end
     end
 
     def []=(key, value)
       key = key.to_s if key.is_a? Symbol
       value = Conversions.from_ruby(value)
-      value = value.__pyobj__ unless value.kind_of? LibPython::PyObjectStruct
+      value = value.__pyobj__ unless value.kind_of? PyPtr
       if key.is_a? String
         LibPython.PyDict_SetItemString(__pyobj__, key, value)
       else

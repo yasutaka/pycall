@@ -5,7 +5,7 @@ module PyCall
 
     def self.new(init=nil)
       case init
-      when LibPython::PyObjectStruct
+      when PyPtr
         super
       when nil
         new(0)

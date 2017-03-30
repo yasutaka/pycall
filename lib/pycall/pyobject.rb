@@ -3,13 +3,13 @@ module PyCall
     include PyObjectWrapper
 
     def self.null
-      new(LibPython::PyObjectStruct.new(FFI::Pointer::NULL))
+      new(PyPtr.new(FFI::Pointer::NULL))
     end
   end
 
   def self.getattr(pyobj, name, default=nil)
     name = check_attr_name(name)
-    pyobj = pyobj.__pyobj__ unless pyobj.kind_of? LibPython::PyObjectStruct
+    pyobj = pyobj.__pyobj__ unless pyobj.kind_of? PyPtr
     value = LibPython.PyObject_GetAttrString(pyobj, name)
     if value.null?
       return default if default
@@ -21,15 +21,15 @@ module PyCall
   def self.setattr(pyobj, name, value)
     name = check_attr_name(name)
     value = Conversions.from_ruby(value)
-    value = value.__pyobj__ unless pyobj.kind_of? LibPython::PyObjectStruct
-    pyobj = pyobj.__pyobj__ unless pyobj.kind_of? LibPython::PyObjectStruct
+    value = value.__pyobj__ unless pyobj.kind_of? PyPtr
+    pyobj = pyobj.__pyobj__ unless pyobj.kind_of? PyPtr
     return self unless LibPython.PyObject_SetAttrString(pyobj, name, value) == -1
     raise PyError.fetch
   end
 
   def self.hasattr?(pyobj, name)
     name = check_attr_name(name)
-    pyobj = pyobj.__pyobj__ unless pyobj.kind_of? LibPython::PyObjectStruct
+    pyobj = pyobj.__pyobj__ unless pyobj.kind_of? PyPtr
     1 == LibPython.PyObject_HasAttrString(pyobj, name)
   end
 
@@ -41,7 +41,7 @@ module PyCall
   private_class_method :check_attr_name
 
   def self.getitem(pyobj, key)
-    pyobj = pyobj.__pyobj__ unless pyobj.kind_of? LibPython::PyObjectStruct
+    pyobj = pyobj.__pyobj__ unless pyobj.kind_of? PyPtr
     pykey = Conversions.from_ruby(key)
     value = LibPython.PyObject_GetItem(pyobj, pykey)
     return value.to_ruby unless value.null?
@@ -49,7 +49,7 @@ module PyCall
   end
 
   def self.setitem(pyobj, key, value)
-    pyobj = pyobj.__pyobj__ unless pyobj.kind_of? LibPython::PyObjectStruct
+    pyobj = pyobj.__pyobj__ unless pyobj.kind_of? PyPtr
     pykey = Conversions.from_ruby(key)
     value = Conversions.from_ruby(value)
     return self unless LibPython.PyObject_SetItem(pyobj, pykey, value) == -1
