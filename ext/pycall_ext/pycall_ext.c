@@ -182,6 +182,14 @@ pyptr_s_init(VALUE klass, VALUE libpython)
   return Qtrue;
 }
 
+static VALUE
+pyptr_s_none(VALUE klass)
+{
+  VALUE obj = pyptr_alloc(klass);
+  pyptr_init(obj, Py_None, 0, 0);
+  return obj;
+}
+
 void
 Init_pycall_ext(void)
 {
@@ -197,6 +205,7 @@ Init_pycall_ext(void)
   rb_define_method(cPyPtr, "__address__", pyptr_get_address, 0);
 
   rb_define_singleton_method(cPyPtr, "__init__", pyptr_s_init, 1);
+  rb_define_singleton_method(cPyPtr, "none", pyptr_s_none, 0);
 
   id_incref = rb_intern("incref");
   id_to_ptr = rb_intern("to_ptr");
