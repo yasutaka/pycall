@@ -117,42 +117,41 @@ module PyCall
 
     # --- global variables ---
 
-
-    def self.Py_None
-      _Py_NoneStruct
+    define_singleton_method(:pyglobal) do |name|
+      PyPtr.new(libpython.find_variable(name.to_s))
     end
 
-    attach_variable :PyType_Type, PyObjectStruct
+    PyType_Type = pyglobal(:PyType_Type)
 
     if libpython.find_variable('PyInt_Type')
       has_PyInt_Type = true
-      attach_variable :PyInt_Type, PyObjectStruct
+      PyInt_Type = pyglobal(:PyInt_Type)
     else
       has_PyInt_Type = false
-      attach_variable :PyInt_Type, :PyLong_Type, PyObjectStruct
+      PyInt_Type = pyglobal(:PyLong_Type)
     end
 
-    attach_variable :PyLong_Type, PyObjectStruct
-    attach_variable :PyBool_Type, PyObjectStruct
-    attach_variable :PyFloat_Type, PyObjectStruct
-    attach_variable :PyComplex_Type, PyObjectStruct
-    attach_variable :PyUnicode_Type, PyObjectStruct
+    PyLong_Type = pyglobal(:PyLong_Type)
+    PyBool_Type = pyglobal(:PyBool_Type)
+    PyFloat_Type = pyglobal(:PyFloat_Type)
+    PyComplex_Type = pyglobal(:PyComplex_Type)
+    PyUnicode_Type = pyglobal(:PyUnicode_Type)
 
     if libpython.find_symbol('PyString_FromStringAndSize')
       string_as_bytes = false
-      attach_variable :PyString_Type, PyObjectStruct
+      PyString_Type = pyglobal(:PyString_Type)
     else
       string_as_bytes = true
-      attach_variable :PyString_Type, :PyBytes_Type, PyObjectStruct
+      PyString_Type = pyglobal(:PyBytes_Type)
     end
 
-    attach_variable :PyList_Type, PyObjectStruct
-    attach_variable :PyTuple_Type, PyObjectStruct
-    attach_variable :PyDict_Type, PyObjectStruct
-    attach_variable :PySet_Type, PyObjectStruct
+    PyList_Type = pyglobal(:PyList_Type)
+    PyTuple_Type = pyglobal(:PyTuple_Type)
+    PyDict_Type = pyglobal(:PyDict_Type)
+    PySet_Type = pyglobal(:PySet_Type)
 
-    attach_variable :PyFunction_Type, PyObjectStruct
-    attach_variable :PyMethod_Type, PyObjectStruct
+    PyFunction_Type = pyglobal(:PyFunction_Type)
+    PyMethod_Type = pyglobal(:PyMethod_Type)
 
     # --- functions ---
 
