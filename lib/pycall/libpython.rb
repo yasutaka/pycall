@@ -118,7 +118,15 @@ module PyCall
     PyPtr.class_eval do
       extend FFI::DataConverter
 
-      native_type :uintptr_t
+      if FFI::TypeDefs.has_key? :uintptr_t
+        native_type :uintptr_t
+      elsif FFI.type_size(:ulong) == FFI.type_size(:pointer)
+        native_type :ulong
+      elsif FFI.type_size(:ulong_long) == FFI.type_size(:pointer)
+        native_type :ulong_long
+      else
+        raise "Ruby requires sizeof(long) or sizeof(long_long) is equal to sizeof(void*)"
+      end
 
       def self.from_native(addr, ctx)
         self.new(addr)
