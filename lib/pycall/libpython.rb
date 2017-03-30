@@ -161,11 +161,6 @@ module PyCall
     attach_function :Py_IsInitialized, [], :int
     attach_function :PySys_SetArgvEx, [:int, :pointer, :int], :void
 
-    # Reference count
-
-    attach_function :Py_IncRef, [PyObjectStruct.by_ref], :void
-    attach_function :Py_DecRef, [PyObjectStruct.by_ref], :void
-
     # Object
 
     attach_function :PyObject_RichCompare, [PyObjectStruct.by_ref, PyObjectStruct.by_ref, :int], PyObjectStruct.by_ref
