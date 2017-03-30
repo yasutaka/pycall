@@ -7,6 +7,16 @@
 # define UNLIKELY(x) x
 #endif
 
+#ifndef NUM2VOIDP
+# if SIZEOF_LONG == SIZEOF_VOIDP
+#  define NUM2VOIDP(x) ((void *)NUM2ULONG(x))
+# elif SIZEOF_LONG_LONG == SIZEOF_VOIDP
+#  define NUM2VOIDP(x) ((void *)NUM2ULL(x))
+# else
+#  error ---->> ruby requires sizeof(void*) == sizeof(long) or sizeof(LONG_LONG) to be compiled. <<----
+# endif
+#endif
+
 #include "ruby-ffi.h"
 
 #include <inttypes.h>

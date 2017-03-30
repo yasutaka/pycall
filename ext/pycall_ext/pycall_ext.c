@@ -10,6 +10,7 @@ static VALUE rbffi_PointerClass;
 static ID id_incref;
 static ID id_to_ptr;
 
+static PyObject *Py_None;
 static void (*Py_IncRef)(PyObject *);
 static void (*Py_DecRef)(PyObject *);
 
@@ -32,6 +33,14 @@ static inline int
 ffi_pointer_p(VALUE obj)
 {
   return CLASS_OF(obj) == rbffi_PointerClass;
+}
+
+static void *
+ffi_pointer_get_pointer(VALUE obj)
+{
+  Pointer *ffi_ptr;
+  Data_Get_Struct(obj, Pointer, ffi_ptr);
+  return ffi_ptr->memory.address;
 }
 
 static void
@@ -111,13 +120,11 @@ pyptr_initialize(int argc, VALUE *argv, VALUE self)
   }
 
   if (RB_INTEGER_TYPE_P(ptr_like)) {
-    address = (void *)NUM2SIZET(ptr_like);
+    address = NUM2VOIDP(ptr_like);
   }
   else if (ffi_pointer_p(ptr_like)) {
-    Pointer *ffi_ptr;
 ffi_pointer:
-    Data_Get_Struct(ptr_like, Pointer, ffi_ptr);
-    address = ffi_ptr->memory.address;
+    address = ffi_pointer_get_pointer(ptr_like);
   }
   else if (rb_respond_to(ptr_like, id_to_ptr)) {
     ptr_like = rb_funcall2(ptr_like, id_to_ptr, 0, NULL);
@@ -148,6 +155,33 @@ pyptr_get_address(VALUE self)
   return rb_uint_new((VALUE)PYPTR_PYOBJ(pyptr));
 }
 
+static void *
+find_symbol(VALUE libpython, char const *name)
+{
+  VALUE sym;
+
+  sym = rb_funcall(libpython, rb_intern("find_symbol"), 1, rb_str_new_cstr(name));
+  if (NIL_P(sym)) return NULL;
+
+  return ffi_pointer_get_pointer(sym);
+}
+
+static VALUE
+pyptr_s_init(VALUE klass, VALUE libpython)
+{
+  static int initialized = 0;
+
+  if (initialized) return Qfalse;
+
+  Py_IncRef = (void (*)(PyObject *)) find_symbol(libpython, "Py_IncRef");
+  Py_DecRef = (void (*)(PyObject *)) find_symbol(libpython, "Py_DecRef");
+  Py_None = (PyObject *) find_symbol(libpython, "_Py_NoneStruct");
+  Py_IncRef(Py_None);
+
+  initialized = 1;
+  return Qtrue;
+}
+
 void
 Init_pycall_ext(void)
 {
@@ -161,6 +195,8 @@ Init_pycall_ext(void)
   rb_define_method(cPyPtr, "initialize", pyptr_initialize, -1);
   rb_define_method(cPyPtr, "__refcnt__", pyptr_get_refcnt, 0);
   rb_define_method(cPyPtr, "__address__", pyptr_get_address, 0);
+
+  rb_define_singleton_method(cPyPtr, "__init__", pyptr_s_init, 1);
 
   id_incref = rb_intern("incref");
   id_to_ptr = rb_intern("to_ptr");
