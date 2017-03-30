@@ -206,6 +206,24 @@ pyptr_s_none(VALUE klass)
   return obj;
 }
 
+static VALUE
+libpython_s_incref(VALUE mod, VALUE pyptr_obj)
+{
+  pyptr_t *pyptr;
+  TypedData_Get_Struct(pyptr_obj, pyptr_t, &pyptr_data_type, pyptr);
+  Py_IncRef(PYPTR_PYOBJ(pyptr));
+  return pyptr_obj;
+}
+
+static VALUE
+libpython_s_decref(VALUE mod, VALUE pyptr_obj)
+{
+  pyptr_t *pyptr;
+  TypedData_Get_Struct(pyptr_obj, pyptr_t, &pyptr_data_type, pyptr);
+  Py_DecRef(PYPTR_PYOBJ(pyptr));
+  return pyptr_obj;
+}
+
 void
 Init_pycall_ext(void)
 {
@@ -224,6 +242,9 @@ Init_pycall_ext(void)
 
   rb_define_singleton_method(cPyPtr, "__init__", pyptr_s_init, 1);
   rb_define_singleton_method(cPyPtr, "none", pyptr_s_none, 0);
+
+  rb_define_singleton_method(mLibPython, "Py_IncRef", libpython_s_incref, 1);
+  rb_define_singleton_method(mLibPython, "Py_DecRef", libpython_s_decref, 1);
 
   id_incref = rb_intern("incref");
   id_to_ptr = rb_intern("to_ptr");

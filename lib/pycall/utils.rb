@@ -48,13 +48,14 @@ module PyCall
     def none?(pyobj)
       case pyobj
       when FFI::Pointer
-        ptr = pyobj
-      when LibPython::PyObjectStruct
-        ptr = pyobj.to_ptr
+        address = pyobj.address
+      when LibPython::PyPtr
+        address = pyobj.__address__
       else
-        pyobj = pyobj.__pyobj__.to_ptr
+        address = pyobj.__pyobj__.__address__
       end
-      ptr == self.None.to_ptr
+      # FIXME: Do not use PyPtr.none to avoid extra object allocation
+      LibPython::PyPtr.none.__address__ == address
     end
 
     def slice(*args)
