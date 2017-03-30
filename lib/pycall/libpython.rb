@@ -117,7 +117,6 @@ module PyCall
 
     # --- global variables ---
 
-    attach_variable :_Py_NoneStruct, PyObjectStruct
 
     def self.Py_None
       _Py_NoneStruct
