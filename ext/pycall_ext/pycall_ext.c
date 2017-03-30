@@ -112,7 +112,7 @@ pyptr_initialize(int argc, VALUE *argv, VALUE self)
 
   switch (rb_scan_args(argc, argv, "11", &ptr_like, &incref)) {
     case 1:
-      incref = Qtrue;
+      incref = Qfalse;
       break;
 
     default:
