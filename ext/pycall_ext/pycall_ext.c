@@ -231,8 +231,7 @@ Init_pycall_ext(void)
   rbffi_PointerClass = rb_path2class("FFI::Pointer");
 
   mPyCall = rb_define_module("PyCall");
-  mLibPython = rb_define_module_under(mPyCall, "LibPython");
-  cPyPtr = rb_define_class_under(mLibPython, "PyPtr", rb_cObject);
+  cPyPtr = rb_define_class_under(mPyCall, "PyPtr", rb_cObject);
   rb_define_alloc_func(cPyPtr, pyptr_alloc);
   rb_define_method(cPyPtr, "initialize", pyptr_initialize, -1);
   rb_define_method(cPyPtr, "__refcnt__", pyptr_get_refcnt, 0);
@@ -243,6 +242,7 @@ Init_pycall_ext(void)
   rb_define_singleton_method(cPyPtr, "__init__", pyptr_s_init, 1);
   rb_define_singleton_method(cPyPtr, "none", pyptr_s_none, 0);
 
+  mLibPython = rb_define_module_under(mPyCall, "LibPython");
   rb_define_singleton_method(mLibPython, "Py_IncRef", libpython_s_incref, 1);
   rb_define_singleton_method(mLibPython, "Py_DecRef", libpython_s_decref, 1);
 
