@@ -112,6 +112,9 @@ module PyCall
     ffi_lib_flags :lazy, :global
     libpython = find_libpython ENV['PYTHON']
 
+    require 'pycall_ext'
+    PyPtr.__init__(libpython)
+
     # --- global variables ---
 
     attach_variable :_Py_NoneStruct, PyObjectStruct
