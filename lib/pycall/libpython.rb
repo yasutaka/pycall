@@ -271,8 +271,8 @@ module PyCall
     # Tuple
 
     attach_function :PyTuple_New, [:ssize_t], PyPtr
-    attach_function :PyTuple_GetItem, [PyPtr, :ssize_t], PyPtr
-    attach_function :PyTuple_SetItem, [PyPtr, :ssize_t, PyPtr], :int
+    attach_function :PyTuple_GetItem, [PyPtr, :ssize_t], PyPtr # need incref for retval
+    attach_function :PyTuple_SetItem, [PyPtr, :ssize_t, PyPtr], :int # need incref for 3rd argument
     attach_function :PyTuple_Size, [PyPtr], :ssize_t
 
     # Slice
@@ -283,8 +283,8 @@ module PyCall
 
     attach_function :PyList_New, [:ssize_t], PyPtr
     attach_function :PyList_Size, [PyPtr], :ssize_t
-    attach_function :PyList_GetItem, [PyPtr, :ssize_t], PyPtr
-    attach_function :PyList_SetItem, [PyPtr, :ssize_t, PyPtr], :int
+    attach_function :PyList_GetItem, [PyPtr, :ssize_t], PyPtr # need incref for retval
+    attach_function :PyList_SetItem, [PyPtr, :ssize_t, PyPtr], :int # need incref for 3rd argument
     attach_function :PyList_Append, [PyPtr, PyPtr], :int
 
     # Sequence
@@ -296,8 +296,8 @@ module PyCall
     # Dict
 
     attach_function :PyDict_New, [], PyPtr
-    attach_function :PyDict_GetItem, [PyPtr, PyPtr], PyPtr
-    attach_function :PyDict_GetItemString, [PyPtr, :string], PyPtr
+    attach_function :PyDict_GetItem, [PyPtr, PyPtr], PyPtr # need incref for retval
+    attach_function :PyDict_GetItemString, [PyPtr, :string], PyPtr # need incref for retval
     attach_function :PyDict_SetItem, [PyPtr, PyPtr, PyPtr], :int
     attach_function :PyDict_SetItemString, [PyPtr, :string, PyPtr], :int
     attach_function :PyDict_DelItem, [PyPtr, PyPtr], :int
@@ -313,7 +313,6 @@ module PyCall
     attach_function :PySet_Size, [PyPtr], :ssize_t
     attach_function :PySet_Contains, [PyPtr, PyPtr], :int
     attach_function :PySet_Add, [PyPtr, PyPtr], :int
-    attach_function :PySet_Discard, [PyPtr, PyPtr], :int
 
     # Module
 
