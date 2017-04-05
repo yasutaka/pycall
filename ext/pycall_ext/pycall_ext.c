@@ -171,6 +171,25 @@ ffi_pointer:
 }
 
 static VALUE
+pyptr_initialize_copy(VALUE self, VALUE other)
+{
+  pyptr_t *pyptr_self;
+  pyptr_t *pyptr_other;
+
+  TypedData_Get_Struct(self, pyptr_t, &pyptr_data_type, pyptr_self);
+  TypedData_Get_Struct(self, pyptr_t, &pyptr_data_type, pyptr_other);
+
+  if (PYPTR_PYOBJ(pyptr_other) && PYPTR_DECREF_NEEDED_P(pyptr_other)) {
+    Py_DecRef(PYPTR_PYOBJ(pyptr_other));
+  }
+
+  pyptr_other->pyobj = pyptr_self->pyobj;
+  Py_IncRef(PYPTR_PYOBJ(pyptr_other));
+
+  return self;
+}
+
+static VALUE
 pyptr_get_refcnt(VALUE self)
 {
   pyptr_t *pyptr;
@@ -265,6 +284,7 @@ Init_pycall_ext(void)
   cPyPtr = rb_define_class_under(mPyCall, "PyPtr", rb_cObject);
   rb_define_alloc_func(cPyPtr, pyptr_alloc);
   rb_define_method(cPyPtr, "initialize", pyptr_initialize, -1);
+  rb_define_method(cPyPtr, "initialize_copy", pyptr_initialize_copy, 1);
   rb_define_method(cPyPtr, "__refcnt__", pyptr_get_refcnt, 0);
   rb_define_method(cPyPtr, "__address__", pyptr_get_address, 0);
   rb_define_method(cPyPtr, "none?", pyptr_is_none, 0);
