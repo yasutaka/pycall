@@ -15,7 +15,7 @@ RSpec.describe PyCall do
     subject { PyCall.None }
     it { is_expected.to be_none }
     it { is_expected.not_to be_nil }
-    it { is_expected.not_to eq(PyCall.eval('None', conversion: false)) }
+    it { is_expected.to eq(PyCall.eval('None', conversion: false)) }
     specify { expect(PyCall::PyObject.new(subject)).to eq(PyCall.eval('None', conversion: false)) }
   end
 

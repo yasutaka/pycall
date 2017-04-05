@@ -222,6 +222,16 @@ pyptr_is_null(VALUE self)
   return PYPTR_PYOBJ(pyptr) == NULL ? Qtrue : Qfalse;
 }
 
+static VALUE
+pyptr_eq(VALUE self, VALUE other)
+{
+  pyptr_t *pyptr_self;
+  pyptr_t *pyptr_other;
+  TypedData_Get_Struct(self, pyptr_t, &pyptr_data_type, pyptr_self);
+  TypedData_Get_Struct(other, pyptr_t, &pyptr_data_type, pyptr_other);
+  return PYPTR_PYOBJ(pyptr_self) == PYPTR_PYOBJ(pyptr_other);
+}
+
 static void *
 find_symbol(VALUE libpython, char const *name)
 {
@@ -291,6 +301,7 @@ Init_pycall_ext(void)
   rb_define_method(cPyPtr, "__address__", pyptr_get_address, 0);
   rb_define_method(cPyPtr, "none?", pyptr_is_none, 0);
   rb_define_method(cPyPtr, "null?", pyptr_is_null, 0);
+  rb_define_method(cPyPtr, "==", pyptr_eq, 1);
 
   rb_define_singleton_method(cPyPtr, "__init__", pyptr_s_init, 1);
   rb_define_singleton_method(cPyPtr, "none", pyptr_s_none, 0);
