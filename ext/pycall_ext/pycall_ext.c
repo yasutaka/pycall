@@ -177,14 +177,14 @@ pyptr_initialize_copy(VALUE self, VALUE other)
   pyptr_t *pyptr_other;
 
   TypedData_Get_Struct(self, pyptr_t, &pyptr_data_type, pyptr_self);
-  TypedData_Get_Struct(self, pyptr_t, &pyptr_data_type, pyptr_other);
+  TypedData_Get_Struct(other, pyptr_t, &pyptr_data_type, pyptr_other);
 
-  if (PYPTR_PYOBJ(pyptr_other) && PYPTR_DECREF_NEEDED_P(pyptr_other)) {
-    Py_DecRef(PYPTR_PYOBJ(pyptr_other));
+  if (PYPTR_PYOBJ(pyptr_self) && PYPTR_DECREF_NEEDED_P(pyptr_self)) {
+    Py_DecRef(PYPTR_PYOBJ(pyptr_self));
   }
 
-  pyptr_other->pyobj = pyptr_self->pyobj;
-  Py_IncRef(PYPTR_PYOBJ(pyptr_other));
+  pyptr_self->pyobj = PYPTR_PYOBJ(pyptr_other);
+  Py_IncRef(PYPTR_PYOBJ(pyptr_self));
 
   return self;
 }
