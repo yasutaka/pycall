@@ -285,6 +285,7 @@ Init_pycall_ext(void)
   rb_define_alloc_func(cPyPtr, pyptr_alloc);
   rb_define_method(cPyPtr, "initialize", pyptr_initialize, -1);
   rb_define_method(cPyPtr, "initialize_copy", pyptr_initialize_copy, 1);
+  rb_define_method(cPyPtr, "copy!", pyptr_initialize_copy, 1);
   rb_define_method(cPyPtr, "__refcnt__", pyptr_get_refcnt, 0);
   rb_define_method(cPyPtr, "__address__", pyptr_get_address, 0);
   rb_define_method(cPyPtr, "none?", pyptr_is_none, 0);
