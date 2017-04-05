@@ -37,6 +37,9 @@ typedef Py_intptr_t Py_ssize_t;
 typedef struct PyObjectStruct {
   _PyObject_HEAD_EXTRA;
   Py_ssize_t const ob_refcnt;  /* This should be const. */
+#ifdef PYCALL_PYPTR_INIT_LOG
+  struct PyObjectStruct const *const ob_type;   /* This should also be const. */
+#endif
   /* ... */
 } PyObject;
 

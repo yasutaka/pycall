@@ -83,6 +83,17 @@ pyptr_alloc(VALUE klass)
   return obj;
 }
 
+#ifdef PYCALL_PYPTR_INIT_LOG
+static FILE *pyptr_init_log;
+
+static void
+close_pyptr_init_log(void)
+{
+  if (pyptr_init_log != NULL)
+    fclose(pyptr_init_log);
+}
+#endif
+
 static void
 pyptr_init(VALUE obj, PyObject *pyobj, int incref, int decref)
 {
@@ -102,6 +113,19 @@ pyptr_init(VALUE obj, PyObject *pyobj, int incref, int decref)
   if (decref) {
     pyptr->flags |= PYPTR_NEED_DECREF;
   }
+
+#ifdef PYCALL_PYPTR_INIT_LOG
+  fprintf(pyptr_init_log, "obj:0x%"PRIxVALUE"\tpyptr:%p\tpyobj:%p\tincref:%d\tdecref:%d", obj, pyptr, pyptr->pyobj, incref, decref);
+  if (pyptr->pyobj != NULL) {
+    fprintf(pyptr_init_log, "\tob_type:%p", pyptr->pyobj->ob_type);
+  }
+  else {
+    fprintf(pyptr_init_log, "\tob_type:NA");
+  }
+  fprintf(pyptr_init_log, "\tlocation:%s:%d", (rb_sourcefile() != NULL ? rb_sourcefile() : "(null)"), rb_sourceline());
+  fprintf(pyptr_init_log, "\n");
+  fflush(pyptr_init_log);
+#endif
 }
 
 static VALUE
@@ -248,4 +272,9 @@ Init_pycall_ext(void)
 
   id_incref = rb_intern("incref");
   id_to_ptr = rb_intern("to_ptr");
+
+#ifdef PYCALL_PYPTR_INIT_LOG
+  pyptr_init_log = fopen("pyptr_init.log", "w");
+  atexit(close_pyptr_init_log);
+#endif
 }
