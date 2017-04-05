@@ -115,16 +115,21 @@ pyptr_init(VALUE obj, PyObject *pyobj, int incref, int decref)
   }
 
 #ifdef PYCALL_PYPTR_INIT_LOG
-  fprintf(pyptr_init_log, "obj:0x%"PRIxVALUE"\tpyptr:%p\tpyobj:%p\tincref:%d\tdecref:%d", obj, pyptr, pyptr->pyobj, incref, decref);
-  if (pyptr->pyobj != NULL) {
-    fprintf(pyptr_init_log, "\tob_type:%p", pyptr->pyobj->ob_type);
+  {
+    VALUE callers = rb_eval_string("caller");
+    VALUE caller = RARRAY_AREF(callers, 3);
+    fprintf(pyptr_init_log, "obj:0x%"PRIxVALUE"\tpyptr:%p\tpyobj:%p\tincref:%d\tdecref:%d", obj, pyptr, pyptr->pyobj, incref, decref);
+    if (pyptr->pyobj != NULL) {
+      fprintf(pyptr_init_log, "\tob_type:%p", pyptr->pyobj->ob_type);
+    }
+    else {
+      fprintf(pyptr_init_log, "\tob_type:NA");
+    }
+    fprintf(pyptr_init_log, "\tlocation:%s:%d", (rb_sourcefile() != NULL ? rb_sourcefile() : "(null)"), rb_sourceline());
+    fprintf(pyptr_init_log, "\tcaller:%s", StringValueCStr(caller));
+    fprintf(pyptr_init_log, "\n");
+    fflush(pyptr_init_log);
   }
-  else {
-    fprintf(pyptr_init_log, "\tob_type:NA");
-  }
-  fprintf(pyptr_init_log, "\tlocation:%s:%d", (rb_sourcefile() != NULL ? rb_sourcefile() : "(null)"), rb_sourceline());
-  fprintf(pyptr_init_log, "\n");
-  fflush(pyptr_init_log);
 #endif
 }
 
