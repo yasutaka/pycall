@@ -194,6 +194,7 @@ pyptr_get_refcnt(VALUE self)
 {
   pyptr_t *pyptr;
   TypedData_Get_Struct(self, pyptr_t, &pyptr_data_type, pyptr);
+  if (PYPTR_PYOBJ(pyptr) == NULL) return Qnil;
   return SSIZET2NUM(PYPTR_PYOBJ(pyptr)->ob_refcnt);
 }
 
