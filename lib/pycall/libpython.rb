@@ -144,7 +144,7 @@ module PyCall
     # --- global variables ---
 
     define_singleton_method(:pyglobal) do |name|
-      PyPtr.new(libpython.find_variable(name.to_s))
+      PyPtr.new(libpython.find_variable(name.to_s), false, false)
     end
 
     PyType_Type = pyglobal(:PyType_Type)

@@ -131,14 +131,16 @@ pyptr_init(VALUE obj, PyObject *pyobj, int incref, int decref)
 static VALUE
 pyptr_initialize(int argc, VALUE *argv, VALUE self)
 {
-  VALUE ptr_like, incref;
+  VALUE ptr_like, incref, decref;
   void *address;
 
-  switch (rb_scan_args(argc, argv, "11", &ptr_like, &incref)) {
+  switch (rb_scan_args(argc, argv, "12", &ptr_like, &incref, &decref)) {
     case 1:
       incref = Qfalse;
-      break;
-
+      /* fall through */
+    case 2:
+      decref = Qtrue;
+      /* fall through */
     default:
       break;
   }
@@ -158,7 +160,7 @@ ffi_pointer:
     rb_raise(rb_eTypeError, "The argument must be either Integer or FFI::Pointer-like object.");
   }
 
-  pyptr_init(self, (PyObject *)address, RTEST(incref), 1);
+  pyptr_init(self, (PyObject *)address, RTEST(incref), RTEST(decref));
 
   return self;
 }
