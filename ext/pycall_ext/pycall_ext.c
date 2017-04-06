@@ -52,6 +52,9 @@ static void
 pyptr_free(void *ptr)
 {
   if (PYPTR_PYOBJ(ptr) && PYPTR_DECREF_NEEDED_P(ptr)) {
+    if (PYPTR_PYOBJ(ptr)->ob_refcnt <= 0) {
+      rb_bug("PyPtr has a zero or negative refcnt: %p(pyobj=%p, refcnt=%ld)", ptr, PYPTR_PYOBJ(ptr), PYPTR_PYOBJ(ptr)->ob_refcnt);
+    }
     Py_DecRef(PYPTR_PYOBJ(ptr));
   }
   xfree(ptr);
