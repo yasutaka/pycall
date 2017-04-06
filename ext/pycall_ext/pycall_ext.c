@@ -123,6 +123,7 @@ pyptr_init(VALUE obj, PyObject *pyobj, int incref, int decref)
     VALUE caller = RARRAY_AREF(callers, 3);
     fprintf(pyptr_init_log, "obj:0x%"PRIxVALUE"\tpyptr:%p\tpyobj:%p\tincref:%d\tdecref:%d", obj, pyptr, pyptr->pyobj, incref, decref);
     if (pyptr->pyobj != NULL) {
+      fprintf(pyptr_init_log, "\tob_refcnt:%"PRIdSIZE, pyptr->pyobj->ob_refcnt);
       fprintf(pyptr_init_log, "\tob_type:%p", pyptr->pyobj->ob_type);
     }
     else {
