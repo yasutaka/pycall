@@ -232,6 +232,25 @@ pyptr_eq(VALUE self, VALUE other)
   return PYPTR_PYOBJ(pyptr_self) == PYPTR_PYOBJ(pyptr_other);
 }
 
+static VALUE
+pyptr_inspect(VALUE self)
+{
+  VALUE str, cname;
+  pyptr_t *pyptr;
+  TypedData_Get_Struct(self, pyptr_t, &pyptr_data_type, pyptr);
+
+  cname = rb_class_name(CLASS_OF(self));
+  str = rb_sprintf("#<%"PRIsVALUE":%p pyobj=%p flags=0x%"PRIxVALUE,
+      cname, (void*)self, PYPTR_PYOBJ(pyptr), PYPTR_FLAGS(pyptr));
+  if (PYPTR_PYOBJ(pyptr) != NULL) {
+    rb_str_catf(str, " refcnt=%"PRIdSIZE, PYPTR_PYOBJ(pyptr)->ob_refcnt);
+  }
+  rb_str_cat2(str, ">");
+  OBJ_INFECT(str, self);
+
+  return str;
+}
+
 static void *
 find_symbol(VALUE libpython, char const *name)
 {
@@ -302,6 +321,7 @@ Init_pycall_ext(void)
   rb_define_method(cPyPtr, "none?", pyptr_is_none, 0);
   rb_define_method(cPyPtr, "null?", pyptr_is_null, 0);
   rb_define_method(cPyPtr, "==", pyptr_eq, 1);
+  rb_define_method(cPyPtr, "inspect", pyptr_inspect, 0);
 
   rb_define_singleton_method(cPyPtr, "__init__", pyptr_s_init, 1);
   rb_define_singleton_method(cPyPtr, "none", pyptr_s_none, 0);
