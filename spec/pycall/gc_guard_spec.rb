@@ -15,10 +15,9 @@ module PyCall
       expect { ObjectSpace._id2ref(obj_id) }.not_to raise_error
 
       GCGuard.unregister(pyobj)
-      expect(GCGuard.guarded_object_count).to eq(0)
-
       GC.start
       expect { ObjectSpace._id2ref(obj_id) }.to raise_error(RangeError)
+      expect(GCGuard.guarded_object_count).to eq(0)
     end
 
     describe '.register' do
